@@ -1,0 +1,18 @@
+#Cache Files
+*.log
+*.out
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Data Files
+
+datasets/
+images/
+models/
+tomato/
+
+class.json
+
+
+
