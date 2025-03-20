@@ -1,1 +1,4 @@
 bevdet_r50_ckpt_folded_final_folded.onnx
+simple_bev_model.onnx
+simple_bev_model_fixed.onnx
+size_fixed.onnx
