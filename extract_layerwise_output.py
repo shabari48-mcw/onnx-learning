@@ -3,21 +3,18 @@ import onnx
 import numpy as np
 from collections import OrderedDict
 
-file_name=r"D:\Learn DL\ONNX\scatternd.onnx"
+# file_name="scatternd.onnx"
+# file_name="dynamic_update.onnx"
+file_name="update_without_scatternd.onnx"
 
-data_np = np.array([[0.0, 0.0, 0.0],
-                    [0.0, 0.0, 0.0],
-                    [0.0, 0.0, 0.0]], dtype=np.float32)
+ort_session1 = ort.InferenceSession(file_name)
 
-indices_np = np.array([[1, 0, 2],
-                            [0, 2, 1]], dtype=np.int64)
-
-updates_np = np.array([[1.0, 1.1, 1.2],
-                       [2.0, 2.1, 2.2]], dtype=np.float32)
+print([x.shape for x in ort_session1.get_inputs()])
+input =  [np.random.randn(*x.shape).astype(np.float32) if i!=1 else np.random.randint(0,5,x.shape).astype(np.int64) for i,x in enumerate(ort_session1.get_inputs())]
+inputs = dict(zip((x.name for x in ort_session1.get_inputs()),input))
 
 
-ort_session_1 = ort.InferenceSession(file_name)
-org_outputs = [x.name for x in ort_session_1.get_outputs()]
+org_outputs = [x.name for x in ort_session1.get_outputs()]
 
 model = onnx.load(file_name)
 for node in model.graph.node:
@@ -28,16 +25,8 @@ for node in model.graph.node:
 ort_session = ort.InferenceSession(model.SerializeToString())
 
 outputs = [x.name for x in ort_session.get_outputs()]
-inputs = [x.name for x in ort_session.get_inputs()]
-input_shape = ort_session.get_inputs()[0].shape
 
-
-
-ort_outs = ort_session.run(None, input_feed={
-    "data": data_np,
-    "indices": indices_np,
-    "updates": updates_np,
-})
+ort_outs = ort_session.run(None, input_feed=inputs)
 
 
 from collections import OrderedDict
